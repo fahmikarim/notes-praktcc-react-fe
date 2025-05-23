@@ -1,5 +1,5 @@
 runtime: nodejs20
-service: bakend-fahmi-028 
+service: frontend-fahmi-028 
 instance_class: F1
 
 handlers:
