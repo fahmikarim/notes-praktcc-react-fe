@@ -22,7 +22,10 @@ steps:
     args:
       - -c
       - |
+        echo "Building React app..."
         npm run build
+        echo "Build completed. Checking build folder:"
+        ls -la build/
     dir: "."
     volumes:
       - name: "npm-cache"
