@@ -1,9 +1,3 @@
-import React, { useEffect, useState, useCallback } from "react";
-import axios from "axios";
-import { jwtDecode } from "jwt-decode";
-import { useNavigate, Link } from "react-router-dom";
-import { BASE_URL } from "../utils";
-
 const DashBoard = () => {
   const [token, setToken] = useState("");
   const [expire, setExpire] = useState(0);
@@ -26,7 +20,10 @@ const DashBoard = () => {
       return response.data.accessToken;
     } catch (error) {
       console.log("Error refreshing token:", error);
-      navigate("/");
+      // Jangan langsung navigate jika ini first load
+      if (error.response?.status === 401) {
+        navigate("/");
+      }
       throw error;
     }
   }, [navigate]);
@@ -48,7 +45,6 @@ const DashBoard = () => {
       return config;
     },
     (error) => {
-      navigate("/");
       return Promise.reject(error);
     }
   );
@@ -69,17 +65,22 @@ const DashBoard = () => {
   useEffect(() => {
     const initializeDashboard = async () => {
       try {
+        console.log("Initializing dashboard...");
         await refreshToken();
+        console.log("Token refreshed successfully");
         await getNotes();
+        console.log("Notes loaded successfully");
       } catch (error) {
         console.log("Initialization failed:", error);
+        // Jika gagal init, redirect ke login
+        navigate("/");
       } finally {
         setLoading(false);
       }
     };
 
     initializeDashboard();
-  }, [refreshToken, getNotes]);
+  }, []); // Remove dependencies to avoid infinite loop
 
   const deleteNotes = async (id) => {
     try {
