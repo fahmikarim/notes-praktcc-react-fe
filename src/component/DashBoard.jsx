@@ -20,10 +20,7 @@ const DashBoard = () => {
       return response.data.accessToken;
     } catch (error) {
       console.log("Error refreshing token:", error);
-      // Jangan langsung navigate jika ini first load
-      if (error.response?.status === 401) {
-        navigate("/");
-      }
+      navigate("/");
       throw error;
     }
   }, [navigate]);
@@ -45,6 +42,7 @@ const DashBoard = () => {
       return config;
     },
     (error) => {
+      navigate("/");
       return Promise.reject(error);
     }
   );
@@ -65,22 +63,17 @@ const DashBoard = () => {
   useEffect(() => {
     const initializeDashboard = async () => {
       try {
-        console.log("Initializing dashboard...");
         await refreshToken();
-        console.log("Token refreshed successfully");
         await getNotes();
-        console.log("Notes loaded successfully");
       } catch (error) {
         console.log("Initialization failed:", error);
-        // Jika gagal init, redirect ke login
-        navigate("/");
       } finally {
         setLoading(false);
       }
     };
 
     initializeDashboard();
-  }, []); // Remove dependencies to avoid infinite loop
+  }, [refreshToken, getNotes]);
 
   const deleteNotes = async (id) => {
     try {
